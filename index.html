@@ -1,52 +1,96 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analisador de Segurança Digital</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <main class="container">
-        <header>
-            <h1>🔐 Segurança Digital</h1>
-            <p>Projeto de Segurança e Criptografia - 3º Ano Ensino Médio</p>
-        </header>
+import re
+import secrets
+import string
 
-        <!-- Seção 1: Analisador -->
-        <section class="card">
-            <h2>Testar Força da Senha</h2>
-            <div class="input-group">
-                <input type="password" id="password-input" placeholder="Digite uma senha...">
-                <button onclick="analisarSenha()">Analisar</button>
-            </div>
-            <div id="analise-resultado" class="resultado hidden">
-                <p>Status: <strong id="status-senha">-</strong></p>
-                <ul class="lista-requisitos">
-                    <li id="req-comprimento">Mínimo de 12 caracteres</li>
-                    <li id="req-maiuscula">Letra maiúscula</li>
-                    <li id="req-numero">Número</li>
-                    <li id="req-especial">Caractere especial</li>
-                </ul>
-            </div>
-        </section>
+def verificar_forca_senha(senha: str) -> dict:
+    """
+    Analisa a força de uma senha com base em critérios de segurança digital.
+    """
+    comprimento = len(senha)
+    tem_maiuscula = bool(re.search(r'[A-Z]', senha))
+    tem_minuscula = bool(re.search(r'[a-z]', senha))
+    tem_numero = bool(re.search(r'[0-9]', senha))
+    tem_especial = bool(re.search(r'[^A-Za-z0-9]', senha))
+    
+    # Contagem de critérios atendidos
+    criterios_atendidos = sum([
+        comprimento >= 12,
+        tem_maiuscula,
+        tem_minuscula,
+        tem_numero,
+        tem_especial
+    ])
+    
+    # Classificação
+    if comprimento < 8:
+        classificacao = "Muito Fraca (Muito curta)"
+    elif criterios_atendidos == 5:
+        classificacao = "Forte"
+    elif criterios_atendidos >= 3:
+        classificacao = "Moderada"
+    else:
+        classificacao = "Fraca"
+        
+    return {
+        "comprimento": comprimento,
+        "maiuscula": tem_maiuscula,
+        "minuscula": tem_minuscula,
+        "numero": tem_numero,
+        "especial": tem_especial,
+        "classificacao": classificacao
+    }
 
-        <!-- Seção 2: Gerador -->
-        <section class="card">
-            <h2>Gerador de Senha Segura</h2>
-            <div class="input-group">
-                <input type="number" id="length-input" value="16" min="12" max="32">
-                <button onclick="gerarSenha()">Gerar</button>
-            </div>
-            <div id="gerador-resultado" class="resultado hidden">
-                <p>Sua senha gerada:</p>
-                <div class="senha-box">
-                    <span id="senha-gerada"></span>
-                </div>
-            </div>
-        </section>
-    </main>
+def gerar_senha_segura(tamanho: int = 16) -> str:
+    """
+    Gera uma senha segura utilizando a biblioteca secrets (criptograficamente segura).
+    """
+    if tamanho < 12:
+        tamanho = 12  # Força o mínimo recomendado por especialistas
+        
+    caracteres = string.ascii_letters + string.digits + string.punctuation
+    senha = "".join(secrets.choice(caracteres) for _ in range(tamanho))
+    return senha
 
-    <script src="script.js"></script>
-</body>
-</html>
+def exibir_menu():
+    print("\n" + "="*40)
+    print("      FERRAMENTA DE SEGURANÇA DIGITAL     ")
+    print("="*40)
+    print("[1] Verificar Força de uma Senha")
+    print("[2] Gerar uma Senha Segura")
+    print("[3] Sair")
+    print("="*40)
+
+def main():
+    while True:
+        exibir_menu()
+        opcao = input("Escolha uma opção (1-3): ").strip()
+        
+        if opcao == "1":
+            senha = input("\nDigite a senha para teste: ")
+            resultado = verificar_forca_senha(senha)
+            
+            print(f"\n--- Resultado da Análise ---")
+            print(f"Classificação: {resultado['classificacao']}")
+            print(f"Comprimento: {resultado['comprimento']} caracteres")
+            print(f"Possui Letra Maiúscula: {'Sim' if resultado['maiuscula'] else 'Não'}")
+            print(f"Possui Letra Minúscula: {'Sim' if resultado['minuscula'] else 'Não'}")
+            print(f"Possui Número: {'Sim' if resultado['numero'] else 'Não'}")
+            print(f"Possui Caractere Especial: {'Sim' if resultado['especial'] else 'Não'}")
+            
+        elif opcao == "2":
+            try:
+                tamanho = int(input("\nDigite o tamanho desejado da senha (mínimo 12): "))
+            except ValueError:
+                tamanho = 16
+            
+            senha_gerada = gerar_senha_segura(tamanho)
+            print(f"\nSua senha segura gerada é: {senha_gerada}")
+            
+        elif opcao == "3":
+            print("\nEncerrando o programa de segurança. Proteja seus dados!")
+            break
+        else:
+            print("\nOpção inválida! Tente novamente.")
+
+if __name__ == "__main__":
+    main()
