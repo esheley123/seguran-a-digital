@@ -1,96 +1,78 @@
-import re
-import secrets
-import string
+<!DOCTYPE html>
+<html lang="pt-br">
 
-def verificar_forca_senha(senha: str) -> dict:
-    """
-    Analisa a força de uma senha com base em critérios de segurança digital.
-    """
-    comprimento = len(senha)
-    tem_maiuscula = bool(re.search(r'[A-Z]', senha))
-    tem_minuscula = bool(re.search(r'[a-z]', senha))
-    tem_numero = bool(re.search(r'[0-9]', senha))
-    tem_especial = bool(re.search(r'[^A-Za-z0-9]', senha))
-    
-    # Contagem de critérios atendidos
-    criterios_atendidos = sum([
-        comprimento >= 12,
-        tem_maiuscula,
-        tem_minuscula,
-        tem_numero,
-        tem_especial
-    ])
-    
-    # Classificação
-    if comprimento < 8:
-        classificacao = "Muito Fraca (Muito curta)"
-    elif criterios_atendidos == 5:
-        classificacao = "Forte"
-    elif criterios_atendidos >= 3:
-        classificacao = "Moderada"
-    else:
-        classificacao = "Fraca"
-        
-    return {
-        "comprimento": comprimento,
-        "maiuscula": tem_maiuscula,
-        "minuscula": tem_minuscula,
-        "numero": tem_numero,
-        "especial": tem_especial,
-        "classificacao": classificacao
-    }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de senha</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 
-def gerar_senha_segura(tamanho: int = 16) -> str:
-    """
-    Gera uma senha segura utilizando a biblioteca secrets (criptograficamente segura).
-    """
-    if tamanho < 12:
-        tamanho = 12  # Força o mínimo recomendado por especialistas
-        
-    caracteres = string.ascii_letters + string.digits + string.punctuation
-    senha = "".join(secrets.choice(caracteres) for _ in range(tamanho))
-    return senha
+<body>
+    <section class="conteudo">
+        <div class="conteudo-titulo">
+            <img src="unlock.svg" alt="cadeado fechado">
+            <h2 class="titulo-principal">Gerador de senhas</h2>
+            <h3 class="titulo-secundario">Gere instantaneamente uma senha aleatória e segura</h3>
+        </div>
+        <div class="parametro-senha">
+            <h4 class="parametro-senha__titulo">Características da senha</h4>
+            <div class="parametro-senha-checkbox">
+                <input name="maiusculo" type="checkbox" class="checkbox" checked>
+                <label for="maiusculo">Letras maiúsculas</label>
+            </div>
+            <div class="parametro-senha-checkbox">
+                <input name="minusculo" type="checkbox" class="checkbox">
+                <label for="minusculo">Letras minúsculas</label>
+            </div>
+            <div class="parametro-senha-checkbox">
+                <input name="numero" type="checkbox" class="checkbox">
+                <label for="numero">Números</label>
+            </div>
+            <div class="parametro-senha-checkbox">
+                <input name="simbolo" type="checkbox" class="checkbox">
+                <label for="simbolo">Símbolos</label>
+            </div>
+            <div class="parametro-senha">
+                <h4 class="parametro-senha__titulo">Força da senha</h4>
+                <div class="barra"></div>
+                <div class="forca fraca"></div>
+                <div class="parametro-senha-textos">
+                    <p>Fraca</p>
+                    <p>Média</p>
+                    <p>Forte</p>
+                </div>
+            </div>
+        </div>
 
-def exibir_menu():
-    print("\n" + "="*40)
-    print("      FERRAMENTA DE SEGURANÇA DIGITAL     ")
-    print("="*40)
-    print("[1] Verificar Força de uma Senha")
-    print("[2] Gerar uma Senha Segura")
-    print("[3] Sair")
-    print("="*40)
+        <div class="parametro">
+            <h3 class="parametro-titulo">Personalize sua senha</h3>
+            <div class="parametro-coluna__senha">
+                <div class="parametro-senha">
+                    <h4 class="parametro-senha__titulo">Número de caracteres</h4>
+                    <div class="parametro-senha-botoes">
+                        <button class="parametro-senha__botao">-</button>
+                        <p class="parametro-senha__texto">11</p>
+                        <button class="parametro-senha__botao">+</button>
+                    </div>
+                </div>
+                <div class="parametro-senha">
+                    <h4 class="parametro-senha__titulo">Número de caracteres</h4>
+                    <div class="parametro-senha-botoes">
+                        <button class="parametro-senha__botao">-</button>
+                        <p class="parametro-senha__texto">11</p>
+                        <button class="parametro-senha__botao">+</button>
+                    </div>
+                </div>
+                <div class="parametro-senha">
+                    <h4 class="parametro-senha__titulo">Força da senha</h4>
+                </div>
+            </div>
+        </div>
 
-def main():
-    while True:
-        exibir_menu()
-        opcao = input("Escolha uma opção (1-3): ").strip()
-        
-        if opcao == "1":
-            senha = input("\nDigite a senha para teste: ")
-            resultado = verificar_forca_senha(senha)
-            
-            print(f"\n--- Resultado da Análise ---")
-            print(f"Classificação: {resultado['classificacao']}")
-            print(f"Comprimento: {resultado['comprimento']} caracteres")
-            print(f"Possui Letra Maiúscula: {'Sim' if resultado['maiuscula'] else 'Não'}")
-            print(f"Possui Letra Minúscula: {'Sim' if resultado['minuscula'] else 'Não'}")
-            print(f"Possui Número: {'Sim' if resultado['numero'] else 'Não'}")
-            print(f"Possui Caractere Especial: {'Sim' if resultado['especial'] else 'Não'}")
-            
-        elif opcao == "2":
-            try:
-                tamanho = int(input("\nDigite o tamanho desejado da senha (mínimo 12): "))
-            except ValueError:
-                tamanho = 16
-            
-            senha_gerada = gerar_senha_segura(tamanho)
-            print(f"\nSua senha segura gerada é: {senha_gerada}")
-            
-        elif opcao == "3":
-            print("\nEncerrando o programa de segurança. Proteja seus dados!")
-            break
-        else:
-            print("\nOpção inválida! Tente novamente.")
+        <div class="forca fraca"></div>
+    </section>
+</body>
+<div class="forca fraca"></div>
 
-if __name__ == "__main__":
-    main()
+</html>
